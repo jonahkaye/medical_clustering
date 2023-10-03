@@ -27,13 +27,10 @@ To explore and identify the relationships between various medical diagnoses and 
 - **Similarity Computation**:
   - Calculate the similarity between the embeddings of each diagnosis and the centroids of the identified clusters.
 - **Association Identification**:
-  - Determine which cluster(s) each diagnosis is most similar to, thereby identifying the most related underlying factors.
+  - Determine which cluster(s) each diagnosis is most similar to, thereby identifying the most related underlying factors across the document set.
 - **Validation**:
   - Validate the associations with a gut check (GPT-4, doctor, idk?)
 
 #### Phase 5: Communication and Application
 - **Visualization**:
   - Develop visualizations (e.g., network graphs, heatmaps) to communicate the relationships and findings effectively.
-
-
-This analysis plan provides a structured approach to exploring and understanding the relationships between diagnoses and underlying factors in clinical notes, ensuring a balance between data-driven analysis and expert validation.
