@@ -34,3 +34,25 @@ To explore and identify the relationships between various medical diagnoses and 
 #### Phase 5: Communication and Application
 - **Visualization**:
   - Develop visualizations (e.g., network graphs, heatmaps) to communicate the relationships and findings effectively.
+
+
+
+NOTES:
+
+Allergies
+Chief Complaint:
+Major Surgical or Invasive Procedure x
+History of Present Illness x
+Review of Systems:
+Past Medical History x
+Social History
+Family History
+Physical Exam
+Pertinent Results
+Brief Hospital Course x
+Medications on Admission:
+Discharge Medications:
+Discharge Disposition:
+Discharge Diagnosis:
+Discharge Condition:
+

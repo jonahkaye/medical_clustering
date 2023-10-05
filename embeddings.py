@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from transformers import AutoModel, AutoTokenizer
 import logging
+import json
 
 logging.getLogger('transformers.modeling_utils').setLevel(logging.ERROR)
 
@@ -26,44 +27,30 @@ class Embedder:
             embedding = self.create_embedding_bert(text)
             embeddings.append(embedding)
 
-        embedded_df = pd.DataFrame({
-            'original_text': df[text_column],
-            'embedding': embeddings
-        })
+        df['embedding'] = [json.dumps(embed.tolist()) for embed in embeddings]
+        return df
+    
+    def get_k_most_similar_factors_for_condition_vector(self, embedded_df, input_vector, file_paths, k=5):
+        # Filter for underlying factors from the specified files
+        factors = embedded_df[(embedded_df['type'] == "underlying factor") & (embedded_df['file'].isin(file_paths))]
 
-        return embedded_df
-
-    def get_k_most_relevant_texts(self, input_text, embedded_df, k=5):
-        input_embedding = self.create_embedding_bert(input_text)
+        results = {}  # To store the results
         similarities = []
 
-        for index, row in embedded_df.iterrows():
-            similarity = cosine_similarity([input_embedding], [row['embedding']])[0][0]
-            similarities.append((row['original_text'], similarity))
+        # Reshape the input vector for compatibility with cosine_similarity
+        input_vector_reshaped = input_vector.reshape(1, -1)
+
+        for _, factor_row in factors.iterrows():
+            factor_text = factor_row['sentence']
+            factor_embedding = np.array(factor_row['embedding']).reshape(1, -1)
+
+            similarity = cosine_similarity(input_vector_reshaped, factor_embedding)
+            similarities.append((factor_text, similarity))
 
         # Sort by similarity and select top k
         similarities.sort(key=lambda x: x[1], reverse=True)
-        top_k_texts = similarities[:k]
+        top_k_factors = similarities[:k]
 
-        return top_k_texts
+        # Return the results (could be associated with a condition text or an ID for reference if needed)
+        return top_k_factors
 
-
-if __name__ == "__main__":
-    your_texts = ["The doctor advised taking vitamins.",
-                  "Apples are healthy.",
-                  "Hospitals require efficient management.",
-                  "Regular check-ups are important for maintaining health.",
-                  "Vaccines are crucial for disease prevention."
-                  ]
-    df = pd.DataFrame(your_texts, columns=['original_text'])
-
-    embedder_instance = Embedder()
-    embedded_df = embedder_instance.embed_texts_in_df(df, 'original_text')
-
-    input_text = "How essential are regular health check-ups?"
-    k_most_relevant = embedder_instance.get_k_most_relevant_texts(input_text, embedded_df, k=3)
-
-    print("Input text:", input_text)
-    print("\nTop k most relevant texts:")
-    for i, (text, sim) in enumerate(k_most_relevant):
-        print(f"{i+1}. {text} (Similarity: {sim:.4f})")
